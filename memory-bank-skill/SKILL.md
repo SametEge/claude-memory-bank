@@ -7,6 +7,9 @@ description: >
   Creates and maintains structured markdown files (projectBrief, productContext,
   activeContext, systemPatterns, techContext, progress) in a memory-bank/ directory
   to preserve project knowledge between conversations.
+  IMPORTANT: Automatically reads memory bank BEFORE starting any task, and
+  automatically updates memory bank AFTER every code change or significant action.
+  This is mandatory behavior - do not skip or ask permission.
 ---
 
 # Memory Bank Skill
@@ -116,11 +119,25 @@ memory-bank/
 
 ## Behavior Rules
 
-1. **If Memory Bank exists → Read it first.** Before doing anything in a project that has a `memory-bank/` directory, read all files. No exceptions.
-2. **If Memory Bank doesn't exist and user wants to work on a project → Suggest initialization.** Politely ask: "I notice this project doesn't have a Memory Bank yet. Would you like me to initialize one so I can maintain context across our sessions?"
-3. **After significant work → Offer to update.** When you've completed a meaningful piece of work, say: "Would you like me to update the Memory Bank with what we've done?"
+### MANDATORY: Auto-Read Before Every Task
+1. **If Memory Bank exists → Read it FIRST. ALWAYS. NO EXCEPTIONS.** Before doing ANY work — coding, answering questions, debugging, planning — read all six Memory Bank files. This is not optional. Do this silently without asking the user. If you skip this step, you are operating blind and will make mistakes.
+
+### MANDATORY: Auto-Update After Every Change
+2. **After EVERY code change or significant action → Update Memory Bank IMMEDIATELY.** Do NOT wait for the user to ask. Do NOT wait until the end of the session. Every time you:
+   - Write or edit code
+   - Fix a bug
+   - Add a feature
+   - Change configuration
+   - Make an architectural decision
+   - Discover something new about the project
+
+   → **Immediately update** `activeContext.md` and `progress.md`. Update `systemPatterns.md` or `techContext.md` if relevant. Do this silently in the background — do not ask permission.
+
+### Other Rules
+3. **If Memory Bank doesn't exist and user wants to work on a project → Suggest initialization.** Politely ask: "I notice this project doesn't have a Memory Bank yet. Would you like me to initialize one so I can maintain context across our sessions?"
 4. **Never fabricate context.** If the Memory Bank doesn't mention something, don't assume you know it. Ask the user.
 5. **Respect existing content.** When updating, preserve information that's still accurate. Don't rewrite files from scratch unless the content is fundamentally wrong.
+6. **Session start = Full read. Every change = Incremental update.** This is the core loop. Read → Work → Update → Repeat.
 
 ## Error Handling
 
